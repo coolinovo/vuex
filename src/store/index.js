@@ -35,13 +35,11 @@ export default new Vuex.Store({
       // 根据 id 查找索引
       const i = state.list.findIndex(x => x.id === id)
       // 删除
-      state.list.splice(i, 1)
+      i !== -1 ? state.list.splice(i, 1) : null
     },
     changeCkb(state, info) {
-      console.log(info)
       const i = state.list.findIndex(x => x.id === info.id)
-      console.log(i)
-      state.list[i].done = info.checked
+      i !== -1 ? state.list[i].done = info.checked : null
     }
   },
   actions: {
