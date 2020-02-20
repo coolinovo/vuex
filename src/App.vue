@@ -8,7 +8,7 @@
     ></a-input>
     <a-button type="primary" @click="addItem">添加事项</a-button>
 
-    <a-list bordered :dataSource="list" class="dt-list">
+    <a-list bordered :dataSource="infoList" class="dt-list">
             <a-list-item slot="renderItem" slot-scope="item">
               <!-- 复选框 -->
               <a-checkbox :checked="item.done" @change="changeCkb($event, item.id)">{{item.info}}</a-checkbox>
@@ -18,22 +18,22 @@
 
       <div slot="footer" class="footer">
         <!-- 未完成的任务 -->
-        <span>0条剩余</span>
+        <span>{{undo}}条剩余</span>
         <!-- 操作按钮 -->
         <a-button-group>
-          <a-button type="primary">全部</a-button>
-          <a-button type="warning">未完成</a-button>
-          <a-button>已完成</a-button>
+          <a-button :type="viewKey === 'all' ? 'primary': 'default'" @click="changeClick('all')">全部</a-button>
+          <a-button :type="viewKey === 'undone' ? 'primary': 'default'" @click="changeClick('undone')">未完成</a-button>
+          <a-button :type="viewKey === 'done' ? 'primary': 'default'" @click="changeClick('done')">已完成</a-button>
         </a-button-group>
         <!-- 清空已完成 -->
-        <a>清除已完成</a>
+        <a @click="clear">清除已完成</a>
       </div>
     </a-list>
   </div>
 </template>
 
 <script>
-  import { mapState } from 'vuex'
+  import { mapState, mapGetters } from 'vuex'
 
   export default {
     name: 'app',
@@ -41,7 +41,8 @@
       return {}
     },
     computed: {
-      ...mapState(['list', 'inputVal'])
+      ...mapState(['list', 'inputVal', 'viewKey']),
+      ...mapGetters(['undo', 'infoList'])
     },
     created() {
       this.$store.dispatch("getList")
@@ -64,6 +65,12 @@
       changeCkb(e, id) {
         const checked = e.target.checked
         this.$store.commit('changeCkb', {checked, id})
+      },
+      clear() {
+        this.$store.commit('clear')
+      },
+      changeClick(key) {
+        this.$store.commit('changeClick', key)
       }
     }
   }

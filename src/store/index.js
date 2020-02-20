@@ -9,7 +9,8 @@ export default new Vuex.Store({
     list: [],
     // 文本框内容
     inputVal: '',
-    nextId: 5
+    nextId: 5,
+    viewKey: 'all'
   },
   mutations: {
     setList(state, data) {
@@ -40,12 +41,40 @@ export default new Vuex.Store({
     changeCkb(state, info) {
       const i = state.list.findIndex(x => x.id === info.id)
       i !== -1 ? state.list[i].done = info.checked : null
+    },
+    clear(state) {
+      state.list = state.list.filter(x => x.done === false)
+    },
+    changeClick(state, key) {
+      state.viewKey = key
     }
   },
   actions: {
     async getList(context) {
       const {data} = await axios.get('/list.json')
       context.commit('setList', data)
+    }
+  },
+  getters: {
+    // 统计未完成数据
+    undo(state) {
+      const undos = state.list.filter(item => {
+        return item.done === false
+      })
+      console.log(undos)
+      return undos.length
+    },
+    infoList(state) {
+      switch (state.viewKey) {
+        case 'all':
+          return state.list
+        case  'undone':
+          return state.list.filter(x => x.done === false)
+        case 'done':
+          return state.list.filter(x => x.done !== false)
+        default:
+          return state.list
+      }
     }
   }
 })
