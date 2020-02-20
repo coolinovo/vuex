@@ -49,8 +49,110 @@ new Vue({
     ```javascript
       this.$store.state.count
     ```
+    + vuex 方法
+    ```javascript
+      // 从 vuex 中按需导入 mapState 函数
+      import { mapState } from 'vuex'
+      // 通过导入的函数将当前组件需要的全局数据, 映射为当前组件的 computed 计算属性
+      computed: {
+        ...mapState([ 'count' ])
+      } 
+    ```
 ### Mutation
-
+- Vue 不允许在组件里修改 Store 里的数据, Mutation 用于变更数据
+- 可以集中监控所有数据的变化
+    ```javascript
+      // 定义 Mutation
+      const store = new Vuex.Store({
+        mutations: {
+          add(state) {
+            // 变更状态
+            state.count++
+          }   
+        } 
+      })
+  
+      // 触发 Mutation
+      methods: {
+        handle() {
+          // 触发方式 1
+          this.$store.commit('add')
+        }   
+      }
+    ```
+- 传参
+```javascript
+    mutations: {
+      addN(state, step) {
+        // 变更状态
+        state.count += step
+      }   
+    } 
+    handle() {
+      // 触发方式 1
+      this.$store.commit('addN', 3)
+    }   
+```
+- 触发方式 2
+```javascript
+  // 从 vuex 中按需导入 mapMutations 函数
+  import { mapMutations } from "vuex"
+  // 把需要的 mutations 函数映射为当前组件的 methods 方法
+  methods: {
+    ...mapMutations([ 'add', 'addN' ])
+  }
+```
+- mutatios 里面不能使用异步方法
 ### Action
+- 处理异步任务, 但是还是需要通过触发 Mutation 的方式间接变更数据
+- 基本使用
+```javascript
+  const store = new Vuex.store({
+    mutatios: {
+      add(state) {
+        state.count++
+      }
+    },
+    actions: {
+      addAsync(context) {
+        setTimeout(() => {
+          context.commit('add')
+        }, 1000)
+      }
+    }
+  })
 
+  // 触发 Action
+  handle() {
+    // 方式 1
+    this.$store.dispatch('addAsync')
+  }
+```
+- 传参方式和 Mutation 一样
+- 触发方式 2
+```javascript
+  // 从 vuex 中导入 mapActions 函数
+  import { mapActions } from "vuex"
+  // 映射成当前组件的方法
+  methods: {
+    ...mapActions( [ 'addAsync' ] )
+  }
+```
 ### Getter
+- 用于对 Store 中的数据进行加工处理成新的数据
+    + 类似 Vue 的计算属性
+    + Store 中的数据发生变化, Getter 的数据也会跟着变化
+    ```javascript
+      // 定义 Getter
+      const store = new Vuex.Store({
+        state: {
+          count: 0
+        },
+        getters: {
+          showNum: state => {
+            return '当前最新的数量是['+ state.count +']'
+          }
+        }
+      })
+    ```
+- 触发方式一样
